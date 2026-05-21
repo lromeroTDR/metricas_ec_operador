@@ -1,0 +1,7 @@
+.env
+.venv/
+venv/
+__pycache__/
+ec_metrics_coachMetrics.log
+ec_metrics_resumen.log
+.vs/

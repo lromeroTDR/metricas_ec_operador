@@ -33,3 +33,5 @@ API_URLS = {
 }
 
 tags_filtro = ["EC-01", "EC-02","EC-03", "EC-05","EC-08", "EC-10"]
+
+behaviorLabels = "MobileUsage,NoSeatbelt,ObstructedCamera,Braking,Drowsy,MaxSpeed,HarshTurn,Crash,DefensiveDriving,FollowingDistance"

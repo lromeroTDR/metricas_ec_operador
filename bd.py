@@ -5,6 +5,9 @@ import urllib
 import sys
 from config import DB_CONFIG
 
+
+logger = logging.getLogger(__name__)
+
 def obtener_conexion_sql():
     connection_string = (
         f"DRIVER={{ODBC Driver 18 for SQL Server}};"
@@ -23,7 +26,6 @@ def validar_existencia_semanal(fecha_corte_nueva,  table_name = DB_CONFIG['table
     Verifica si la fecha ya existe en la base de datos
     """
     engine = sqlalchemy.create_engine(obtener_conexion_sql())
-    # Usamos el esquema samsara como pediste
     destino = f"{schema}.{table_name}"
     
     query = sqlalchemy.text(f"SELECT COUNT(*) FROM {destino} WHERE fecha_corte = :fecha")
@@ -36,25 +38,28 @@ def validar_existencia_semanal(fecha_corte_nueva,  table_name = DB_CONFIG['table
                 sys.exit()
             else:
                 print(f"Fecha {fecha_corte_nueva} libre. Procesando...")
+        logger.info("Validacion semanal Exitosa")    
     except Exception as e:
+        logger.warning(f"Error al validar: {e}")
         print(f"Error al validar: {e}")
 
 def guardar_en_sql(df, table_name = DB_CONFIG['table'], schema = DB_CONFIG["schema"] ):
     if df.is_empty():
-        logging.warning("DataFrame vacio.")
+        logger.warning("DataFrame vacio.")
         return
 
     engine = sqlalchemy.create_engine(obtener_conexion_sql())
     destino = f"{schema}.{table_name}"
     
     try:
-        logging.info(f"Cargando en: {destino}")
+        logger.info(f"Cargando en: {destino}")
         with engine.begin() as connection:
             df.write_database(
                 table_name=destino, 
                 connection=connection,
                 if_table_exists="append"
             )
-        logging.info("Exito en la carga")
+        logger.info("Exito en la carga")
     except Exception as e:
         print(f"ERROR EN LA CARGA: {e}")
+        logger.warning(f"ERROR EN LA CARGA: {e}")

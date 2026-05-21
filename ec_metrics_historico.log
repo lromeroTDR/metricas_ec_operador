@@ -15,3 +15,5 @@
 2026-05-21 11:24:25 - root - INFO - Cargando en: samsara.reporte_ec_metricas_operador
 2026-05-21 11:24:28 - root - INFO - Exito en la carga
 2026-05-21 11:24:28 - root - INFO - Pipeline completado. Registros: 377
+2026-05-21 12:47:55 - root - INFO - Iniciando la ejecucion global del sistema
+2026-05-21 12:47:55 - fechas - INFO - Parametros de fecha manuales generados: 2026-05-04T00:00:00.000Z - 2026-05-10T23:59:59.000Z

@@ -8,6 +8,7 @@ import fechas
 import logging
 from config import headers
 from wrapp import retry_api
+from config import API_URLS, tags_filtro
 
 logger = logging.getLogger(__name__)
 
@@ -35,27 +36,22 @@ def extraer_score_operadores(url, headers,  start_time, end_time):
         if cursor:
             current_params["after"] = cursor
 
-        try:
-            response = requests.get(url, headers=headers, params=current_params, timeout=30)
-            response.raise_for_status()
+        response = requests.get(url, headers=headers, params=current_params, timeout=30)
+        response.raise_for_status()
 
-            data = response.json()
-            events = data.get("data", [])
-            all_events.extend(events)
+        data = response.json()
+        events = data.get("data", [])
+        all_events.extend(events)
 
-            # Extraer información de paginación
-            pagination = data.get("pagination", {})
-            has_next_page = pagination.get("has_next_page", False)
-            cursor = pagination.get("endCursor") # O la llave que use tu API
+        # Extraer información de paginación
+        pagination = data.get("pagination", {})
+        has_next_page = pagination.get("has_next_page", False)
+        cursor = pagination.get("endCursor") # O la llave que use tu API
 
-            logger.info(f"Descargados {len(events)} eventos. Total acumulado: {len(all_events)}")
+        logger.info(f"Descargados {len(events)} eventos. Total acumulado: {len(all_events)}")
 
-            if has_next_page:
-                time.sleep(0.5)
-
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Error en la petición: {e}")
-            break # Detener si hay un error de red
+        if has_next_page:
+            time.sleep(0.5)
 
     if all_events:
         logger.info("Proceso finalizado exitosamente")
@@ -408,27 +404,28 @@ def unir_metricasCoach(df, metricas, end_time):
     )
     return metricasCoach
 
+
 def pipeline():
   
     start_time, end_time = fechas.fecha_z_automatica()
-    url = "https://api.samsara.com/safety-scores/drivers"
+    url = API_URLS["scores"]
     scores_operadores = extraer_score_operadores(url, headers, start_time, end_time)
     scores_operadores_transformado = transformacion_operadores_eventos(scores_operadores)
     scores_operadores_transformado.head()
-    url_eventos = "https://api.samsara.com/safety-events/stream"
+    url_eventos = API_URLS["events"]
     df_eventos_created = extraer_eventos_seguridad(start_time, end_time, headers, url_eventos, "createdAtTime")
     df_reporte = transformar_eventos_seguridad(df_eventos_created)
     df_reporte.head()
     df_consolidado = unir_metricas_operadores(scores_operadores_transformado, df_reporte)
     df_consolidado.head()
-    url_metadata ="https://api.samsara.com/fleet/drivers"
+    url_metadata = API_URLS["drivers"]
     df_drivers = extraer_operadores(headers=headers, url_operadores=url_metadata)
     df_drivers_transformado = transformacion_operadores(df_operadores=df_drivers)
     df_drivers_transformado.head()
-    url = "https://api.samsara.com/tags"
+    url = API_URLS["tags"]
     tags = extraer_tags_samsara(headers, url)
-    tags_filtro = ["EC-01", "EC-02","EC-03", "EC-05","EC-08", "EC-10"]
-    tags_transformado = transformacion_tags(df_tags=tags, tags_filtro=tags_filtro)
+    filtro = tags_filtro
+    tags_transformado = transformacion_tags(df_tags=tags, tags_filtro=filtro)
     df_operadores_tags = unir_tags_operadores(df_operadores=df_drivers_transformado, df_tags=tags_transformado, tags_filtro=tags_filtro)
     df_operadores_tags.head()
     df_metricas_final = unir_metricasCoach(df_consolidado, df_operadores_tags, end_time=end_time)
@@ -438,24 +435,24 @@ def pipeline():
 def pipeline_manual(dia_i, mes_i, ano_i, dia_f, mes_f, ano_f):
   
     start_time, end_time = fechas.fecha_z_manual(dia_i, mes_i, ano_i, dia_f, mes_f, ano_f)
-    url = "https://api.samsara.com/safety-scores/drivers"
+    url = API_URLS["scores"]
     scores_operadores = extraer_score_operadores(url, headers, start_time, end_time)
     scores_operadores_transformado = transformacion_operadores_eventos(scores_operadores)
     scores_operadores_transformado.head()
-    url_eventos = "https://api.samsara.com/safety-events/stream"
+    url_eventos = API_URLS["events"]
     df_eventos_created = extraer_eventos_seguridad(start_time, end_time, headers, url_eventos, "createdAtTime")
     df_reporte = transformar_eventos_seguridad(df_eventos_created)
     df_reporte.head()
     df_consolidado = unir_metricas_operadores(scores_operadores_transformado, df_reporte)
     df_consolidado.head()
-    url_metadata ="https://api.samsara.com/fleet/drivers"
+    url_metadata = API_URLS["drivers"]
     df_drivers = extraer_operadores(headers=headers, url_operadores=url_metadata)
     df_drivers_transformado = transformacion_operadores(df_operadores=df_drivers)
     df_drivers_transformado.head()
-    url = "https://api.samsara.com/tags"
+    url = API_URLS["tags"]
     tags = extraer_tags_samsara(headers, url)
-    tags_filtro = ["EC-01", "EC-02","EC-03", "EC-05","EC-08", "EC-10"]
-    tags_transformado = transformacion_tags(df_tags=tags, tags_filtro=tags_filtro)
+    filtro = tags_filtro
+    tags_transformado = transformacion_tags(df_tags=tags, tags_filtro=filtro)
     df_operadores_tags = unir_tags_operadores(df_operadores=df_drivers_transformado, df_tags=tags_transformado, tags_filtro=tags_filtro)
     df_operadores_tags.head()
     df_metricas_final = unir_metricasCoach(df_consolidado, df_operadores_tags, end_time=end_time)

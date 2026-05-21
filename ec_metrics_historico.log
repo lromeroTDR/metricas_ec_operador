@@ -1,0 +1,17 @@
+2026-05-21 11:24:05 - root - INFO - Iniciando la ejecucion global del sistema
+2026-05-21 11:24:05 - fechas - INFO - Parametros de fecha manuales generados: 2026-05-04T00:00:00.000Z - 2026-05-10T23:59:59.000Z
+2026-05-21 11:24:06 - fechas - INFO - Parametros de fecha manuales generados: 2026-05-04T06:00:00.000Z - 2026-05-11T05:59:59.000Z
+2026-05-21 11:24:06 - wrapp - INFO - Iniciando intento 1 para: extraer_score_operadores
+2026-05-21 11:24:07 - ec_metrics_pipeline - INFO - Descargados 377 eventos. Total acumulado: 377
+2026-05-21 11:24:07 - ec_metrics_pipeline - INFO - Proceso finalizado exitosamente
+2026-05-21 11:24:07 - wrapp - INFO - Iniciando intento 1 para: extraer_eventos_seguridad
+2026-05-21 11:24:21 - wrapp - INFO - Iniciando intento 1 para: extraer_operadores
+2026-05-21 11:24:24 - ec_metrics_pipeline - INFO - Éxito: Se obtuvieron 564 registros activos.
+2026-05-21 11:24:24 - ec_metrics_pipeline - INFO - Iniciando intento ['driverId', 'driverName', 'tagId', 'tagName', 'parentTagId']
+2026-05-21 11:24:24 - wrapp - INFO - Iniciando intento 1 para: extraer_tags_samsara
+2026-05-21 11:24:25 - ec_metrics_pipeline - INFO - Éxito: Se obtuvieron 56 tags.
+2026-05-21 11:24:25 - ec_metrics_pipeline - INFO - Éxito: Se obtuvieron 6 tags.
+2026-05-21 11:24:25 - ec_metrics_pipeline - INFO - Éxito: Columna agregada correctamente.
+2026-05-21 11:24:25 - root - INFO - Cargando en: samsara.reporte_ec_metricas_operador
+2026-05-21 11:24:28 - root - INFO - Exito en la carga
+2026-05-21 11:24:28 - root - INFO - Pipeline completado. Registros: 377
